@@ -56,7 +56,14 @@
 (function () {
   var input = document.getElementById('cid');
   var out = document.getElementById('result');
-  var data = null;
+  // ===== SERTİFİKA VERİLERİ: yeni kayıtları buraya ekleyin =====
+  var data = {
+    issuer: "B-Novative",
+    certificates: [
+      { id: "BNV-UNI101-2026-089", name: "MELTEM AKYOL", project: "Uni101 App", duration: "14 Days", issued: "October 5, 2026" }
+    ]
+  };
+  // ===============================================================
 
   function norm(s) { return String(s || '').trim().toUpperCase().replace(/\s+/g, ''); }
 
@@ -90,7 +97,6 @@
   function verify() {
     var id = norm(input.value);
     if (!id) { out.textContent = ''; return; }
-    if (!data) { out.textContent = ''; out.appendChild(el('div', 'res bad', 'Veri yüklenemedi. Sayfayı yenileyip tekrar deneyin.')); return; }
     var found = data.certificates.filter(function (c) { return norm(c.id) === id; })[0];
     show(found || null);
   }
@@ -98,16 +104,8 @@
   document.getElementById('btn').addEventListener('click', verify);
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') verify(); });
 
-  fetch('certificates.json', { cache: 'no-store' })
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (j) {
-      data = j;
-      var q = new URLSearchParams(location.search).get('id');
-      if (q) { input.value = q; verify(); }
-    })
-    .catch(function () {
-      out.appendChild(el('div', 'res bad', 'Sertifika verisi yüklenemedi.'));
-    });
+  var q = new URLSearchParams(location.search).get('id');
+  if (q) { input.value = q; verify(); }
 })();
 </script>
 </body>
